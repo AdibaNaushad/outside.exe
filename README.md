@@ -1,4 +1,4 @@
-```
+
 # Outside.exe 🌸
 > **Replacing doomscrolling with IRL side quests using local Gemma 🐾**  
 > *Turn your neighborhood into a cozy RPG where every real-world flower found levels up your garden companion.*
@@ -119,5 +119,4 @@ Running **Gemma 2B** locally ensures:
 2. **Zero Ongoing Costs:** The inference engine runs locally or on self-hosted instances without token consumption fees.
 3. **Deterministic Control:** Open model access allows developers to tune prompt contracts and system fallbacks without risk of upstream model deprecation.
 
-```
 
