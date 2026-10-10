@@ -1,25 +1,55 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import ollama
+# import ollama
 import json
+
+import google.generativeai as genai
+import os
 
 app = FastAPI()
 
 # Allow React to talk to this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"], 
-    allow_credentials=True,
+    allow_origins=["*"],    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# UPDATE 2: Initialize Google AI Studio using the environment variable
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+
+# Use the Gemma 2 2B model hosted directly on Google AI Studio
+model = genai.GenerativeModel('gemma-2-2b-it')
 
 # 1. Define what data we expect from React
 class QuestPreferences(BaseModel):
     mood: str
     energy: str
     time: str
+
+
+
+@app.post("/api/quest")
+async def generate_quest(req: QuestRequest):
+    prompt = f"""
+    Write a short real-world side quest for someone who is feeling {req.mood}, has {req.energy} energy, and has {req.time}.
+    You MUST output ONLY valid JSON.
+    Format: {{"title": "Quest Name", "description": "Short description", "steps": ["step 1", "step 2"], "xp": 25}}
+    """
+    
+    # UPDATE 3: Call the API and force it to return clean JSON
+    response = model.generate_content(
+        prompt,
+        generation_config={"response_mime_type": "application/json"}
+    )
+    
+    # Return the parsed JSON back to React
+    return json.loads(response.text)
+
+
 
 # 2. Define the fallback quest in case the AI fails
 FALLBACK_QUEST = {
